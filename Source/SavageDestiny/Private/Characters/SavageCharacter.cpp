@@ -3,6 +3,7 @@
 #include "Characters/SavageCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GroomComponent.h"
 
 ASavageCharacter::ASavageCharacter()
 {
@@ -14,6 +15,14 @@ ASavageCharacter::ASavageCharacter()
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
 	ViewCamera->SetupAttachment(SpringArm);
+	
+	EyeBrows = CreateDefaultSubobject<UGroomComponent>(TEXT("EyeBrows"));
+	EyeBrows->SetupAttachment(GetMesh());
+	EyeBrows->AttachmentName = FString("head");
+
+	Hair = CreateDefaultSubobject<UGroomComponent>(TEXT("Hair"));
+	Hair->SetupAttachment(GetMesh());
+	Hair->AttachmentName = FString("head");
 }
 
 void ASavageCharacter::BeginPlay()
