@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "CharacterTypes.h"
 #include "SavageCharacter.generated.h"
 
 class USpringArmComponent;
@@ -57,4 +58,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* JumpAction;
+
+	/* States */
+	UPROPERTY(VisibleAnywhere)
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
+public:
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 };
