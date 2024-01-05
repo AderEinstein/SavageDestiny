@@ -29,6 +29,10 @@ public:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Jump() override;
+	void Equip();
+
+	/* Combat */
+	void EquipWeapon(AWeapon* Weapon);
 
 	void SetOverlappingItem(AItem* Item) override;
 
@@ -64,13 +68,22 @@ private:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* JumpAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Input)
+	UInputAction* EquipAction;
+
 	/* States */
 	UPROPERTY(VisibleAnywhere)
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState = EActionState::EAS_Unoccupied;
+
 	/* Items */
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
+
+	UPROPERTY(VisibleAnywhere)
+	AWeapon* EquippedWeapon;
 
 public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }

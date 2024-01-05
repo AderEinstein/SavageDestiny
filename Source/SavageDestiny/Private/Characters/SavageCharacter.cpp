@@ -63,6 +63,7 @@ void ASavageCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Jump);
+		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Equip);
 	}
 }
 
@@ -97,6 +98,31 @@ void ASavageCharacter::Look(const FInputActionValue& Value)
 void ASavageCharacter::Jump()
 {
 	Super::Jump();
+}
+
+void ASavageCharacter::Equip()
+{
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	if (OverlappingWeapon)
+	{
+		if (EquippedWeapon)
+		{
+			EquippedWeapon->Destroy();
+		}
+		EquipWeapon(OverlappingWeapon);
+	}
+	else
+	{
+		// Disarm or Arm weapon
+	}
+}
+
+void ASavageCharacter::EquipWeapon(AWeapon* Weapon)
+{
+	Weapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	OverlappingItem = nullptr;
+	EquippedWeapon = Weapon;
 }
 
 void ASavageCharacter::SetOverlappingItem(AItem* Item)
