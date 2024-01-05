@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CharacterTypes.h"
+#include "Interfaces/PickupInterface.h"
 #include "SavageCharacter.generated.h"
 
 class USpringArmComponent;
@@ -13,9 +14,11 @@ class UGroomComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+class AItem;
+class AWeapon;
 
 UCLASS()
-class SAVAGEDESTINY_API ASavageCharacter : public ACharacter
+class SAVAGEDESTINY_API ASavageCharacter : public ACharacter, public IPickupInterface
 {
 	GENERATED_BODY()
 
@@ -26,7 +29,9 @@ public:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Jump() override;
-	
+
+	void SetOverlappingItem(AItem* Item) override;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -62,6 +67,10 @@ private:
 	/* States */
 	UPROPERTY(VisibleAnywhere)
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
+	/* Items */
+	UPROPERTY(VisibleInstanceOnly)
+	AItem* OverlappingItem;
 
 public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }

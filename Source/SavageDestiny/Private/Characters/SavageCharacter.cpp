@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Items/Weapon.h"
 
 ASavageCharacter::ASavageCharacter()
 {
@@ -96,4 +97,9 @@ void ASavageCharacter::Look(const FInputActionValue& Value)
 void ASavageCharacter::Jump()
 {
 	Super::Jump();
+}
+
+void ASavageCharacter::SetOverlappingItem(AItem* Item)
+{
+	OverlappingItem = Item;
 }

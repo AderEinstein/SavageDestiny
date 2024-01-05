@@ -3,6 +3,7 @@
 #include "Items/Item.h"
 #include "SavageDestiny/DebugMacros.h"
 #include "Components/SphereComponent.h"
+#include "Interfaces/PickupInterface.h"
 
 AItem::AItem()
 {
@@ -44,11 +45,17 @@ float AItem::TransformedCos()
 
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
+	if (IPickupInterface* PickupInterface = Cast<IPickupInterface>(OtherActor))
+	{
+		PickupInterface->SetOverlappingItem(this);
+	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	
+	if (IPickupInterface* PickupInterface = Cast<IPickupInterface>(OtherActor))
+	{
+		PickupInterface->SetOverlappingItem(nullptr);
+	}
 }
 
