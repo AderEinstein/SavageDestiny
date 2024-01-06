@@ -71,6 +71,8 @@ void ASavageCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void ASavageCharacter::Move(const FInputActionValue& Value)
 {
+	if (IsOccupied()) return;
+
 	const FVector2D DirectionValue = Value.Get<FVector2D>();
 	if (Controller && DirectionValue != FVector2D::ZeroVector)
 	{
@@ -97,6 +99,8 @@ void ASavageCharacter::Look(const FInputActionValue& Value)
 
 void ASavageCharacter::Jump()
 {
+	if (IsOccupied()) return;
+
 	Super::Jump();
 }
 
@@ -113,8 +117,20 @@ void ASavageCharacter::Equip()
 	}
 	else
 	{
-		// Disarm or Arm weapon
+		if (CanDisArm())
+		{
+			DisArm();
+		}
+		else if (CanArm())
+		{
+			Arm();
+		}
 	}
+}
+
+void ASavageCharacter::SetOverlappingItem(AItem* Item)
+{
+	OverlappingItem = Item;
 }
 
 void ASavageCharacter::EquipWeapon(AWeapon* Weapon)
@@ -125,7 +141,59 @@ void ASavageCharacter::EquipWeapon(AWeapon* Weapon)
 	EquippedWeapon = Weapon;
 }
 
-void ASavageCharacter::SetOverlappingItem(AItem* Item)
+void ASavageCharacter::Arm()
 {
-	OverlappingItem = Item;
+	PlayEquipMontage(FName("Equip"));
+	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	ActionState = EActionState::EAS_EquippingWeapon;
+}
+
+bool ASavageCharacter::CanArm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState == ECharacterState::ECS_Unequipped &&
+		EquippedWeapon;
+}
+
+void ASavageCharacter::DisArm()
+{
+	PlayEquipMontage(FName("Unequip"));
+	CharacterState = ECharacterState::ECS_Unequipped;
+	ActionState = EActionState::EAS_EquippingWeapon;
+}
+
+bool ASavageCharacter::CanDisArm()
+{
+	return ActionState == EActionState::EAS_Unoccupied && CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+void ASavageCharacter::PlayEquipMontage(FName MontageSection)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && EquipMontage)
+	{
+		AnimInstance->Montage_Play(EquipMontage);
+		AnimInstance->Montage_JumpToSection(MontageSection, EquipMontage);
+	}
+}
+
+void ASavageCharacter::AttachWeaponToBack()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
+	}
+}
+
+void ASavageCharacter::AttachWeaponToHand()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+	}
+}
+
+void ASavageCharacter::FinishEquipping()
+{
+	ActionState = EActionState::EAS_Unoccupied;
 }

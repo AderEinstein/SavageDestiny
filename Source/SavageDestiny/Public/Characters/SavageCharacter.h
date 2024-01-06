@@ -33,8 +33,23 @@ public:
 
 	/* Combat */
 	void EquipWeapon(AWeapon* Weapon);
+	void Arm();
+	bool CanArm();
+	void DisArm();
+	bool CanDisArm();
 
 	void SetOverlappingItem(AItem* Item) override;
+
+	void PlayEquipMontage(FName MontageSection);
+
+	UFUNCTION(BlueprintCallable)
+	void AttachWeaponToBack();
+
+	UFUNCTION(BlueprintCallable)
+	void AttachWeaponToHand();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishEquipping();
 
 protected:
 	virtual void BeginPlay() override;
@@ -85,6 +100,11 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	AWeapon* EquippedWeapon;
 
+	/* Animation Montages */
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
+	UAnimMontage* EquipMontage;
+
 public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE bool IsOccupied() const { return ActionState != EActionState::EAS_Unoccupied; }
 };
