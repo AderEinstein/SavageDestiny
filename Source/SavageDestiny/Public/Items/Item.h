@@ -34,10 +34,10 @@ protected:
 
 	/* Item Attributes */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Motion Parameters")
-	float Amplitude = 0.25f;
+	float Amplitude = 0.3f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Motion Parameters")
-	float TimeConstant = 5.f;
+	float TimeConstant = 3.f;
 
 	/* Item Components */
 	UPROPERTY(VisibleAnywhere)

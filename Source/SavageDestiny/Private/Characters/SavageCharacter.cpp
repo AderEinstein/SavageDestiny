@@ -135,6 +135,7 @@ void ASavageCharacter::SetOverlappingItem(AItem* Item)
 
 void ASavageCharacter::EquipWeapon(AWeapon* Weapon)
 {
+	Weapon->DisableMotion();
 	Weapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
 	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 	OverlappingItem = nullptr;

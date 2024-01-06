@@ -14,6 +14,7 @@ AItem::AItem()
 
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	Sphere->SetupAttachment(ItemMesh);
+	Sphere->bHiddenInGame = true;
 }
 
 void AItem::BeginPlay()
