@@ -30,6 +30,8 @@ public:
 	void Look(const FInputActionValue& Value);
 	void Jump() override;
 	void Equip();
+	void Accelerate();
+	void Deccelerate();
 
 	/* Combat */
 	void EquipWeapon(AWeapon* Weapon);
@@ -83,6 +85,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* JumpAction;
 
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* AccelerateAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Input)
 	UInputAction* EquipAction;
 
@@ -92,6 +97,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
+
+	UPROPERTY(VisibleAnywhere)
+	bool bAccelerating = false;
 
 	/* Items */
 	UPROPERTY(VisibleInstanceOnly)
@@ -107,4 +115,5 @@ private:
 public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE bool IsOccupied() const { return ActionState != EActionState::EAS_Unoccupied; }
+	FORCEINLINE bool IsAccelerating() const { return bAccelerating; }
 };

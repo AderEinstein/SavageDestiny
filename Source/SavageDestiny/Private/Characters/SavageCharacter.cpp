@@ -64,6 +64,8 @@ void ASavageCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Jump);
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Equip);
+		EnhancedInputComponent->BindAction(AccelerateAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Accelerate);
+		EnhancedInputComponent->BindAction(AccelerateAction, ETriggerEvent::Completed, this, &ASavageCharacter::Deccelerate);
 	}
 }
 
@@ -126,6 +128,18 @@ void ASavageCharacter::Equip()
 			Arm();
 		}
 	}
+}
+
+void ASavageCharacter::Accelerate()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 800.f;
+	bAccelerating = true;
+}
+
+void ASavageCharacter::Deccelerate()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	bAccelerating = false;
 }
 
 void ASavageCharacter::SetOverlappingItem(AItem* Item)

@@ -23,6 +23,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	{
 		GroundSpeed = UKismetMathLibrary::VSizeXY(SavageCharacterMovement->Velocity);
 		IsFalling = SavageCharacterMovement->IsFalling();
+		IsAccelerating = SavageCharacter->IsAccelerating();
 		CharacterState = SavageCharacter->GetCharacterState();
 	}
 }
