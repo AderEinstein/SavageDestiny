@@ -17,6 +17,8 @@ public:
 	AItem();
 	virtual void Tick(float DeltaTime) override;
 
+	void DisableOverlapEvents();
+
 protected:
 	virtual void BeginPlay() override;
 

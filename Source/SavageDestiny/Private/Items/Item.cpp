@@ -60,3 +60,8 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	}
 }
 
+void AItem::DisableOverlapEvents()
+{
+	Sphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
