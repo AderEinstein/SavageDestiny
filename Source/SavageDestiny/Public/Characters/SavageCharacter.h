@@ -32,6 +32,7 @@ public:
 	void Equip();
 	void Accelerate();
 	void Deccelerate();
+	void Attack();
 
 	/* Combat */
 	void EquipWeapon(AWeapon* Weapon);
@@ -39,10 +40,15 @@ public:
 	bool CanArm();
 	void DisArm();
 	bool CanDisArm();
+	bool CanAttack();
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
 
 	void SetOverlappingItem(AItem* Item) override;
 
 	void PlayEquipMontage(FName MontageSection);
+	int32 PlayAttackMontage();
+	void StopAttackMontage();
 
 	UFUNCTION(BlueprintCallable)
 	void AttachWeaponToBack();
@@ -59,6 +65,10 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:	
+	// Utils
+	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
+	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
+
 	/* Character Components */
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;
@@ -91,6 +101,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Input)
 	UInputAction* EquipAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Input)
+	UInputAction* AttackAction;
+
 	/* States */
 	UPROPERTY(VisibleAnywhere)
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
@@ -111,6 +124,12 @@ private:
 	/* Animation Montages */
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* EquipMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
+	UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TArray<FName> AttackMontageSections;
 
 public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
