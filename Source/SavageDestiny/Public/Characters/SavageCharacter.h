@@ -59,6 +59,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
 
+	UFUNCTION(BlueprintCallable)
+	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

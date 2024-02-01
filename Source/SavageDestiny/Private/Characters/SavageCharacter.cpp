@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Items/Weapon.h"
+#include "Components/BoxComponent.h"
 
 ASavageCharacter::ASavageCharacter()
 {
@@ -246,6 +247,15 @@ void ASavageCharacter::AttachWeaponToHand()
 void ASavageCharacter::FinishEquipping()
 {
 	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void ASavageCharacter::SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled)
+{
+	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
+	{
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedWeapon->IgnoreActors.Empty();
+	}
 }
 
 
