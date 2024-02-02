@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CharacterTypes.h"
 #include "Interfaces/PickupInterface.h"
+#include "BaseCharacter.h"
 #include "SavageCharacter.generated.h"
 
 class USpringArmComponent;
@@ -18,7 +19,7 @@ class AItem;
 class AWeapon;
 
 UCLASS()
-class SAVAGEDESTINY_API ASavageCharacter : public ACharacter, public IPickupInterface
+class SAVAGEDESTINY_API ASavageCharacter : public ABaseCharacter, public IPickupInterface
 {
 	GENERATED_BODY()
 
@@ -32,7 +33,7 @@ public:
 	void Equip();
 	void Accelerate();
 	void Deccelerate();
-	void Attack();
+	virtual void Attack() override;
 
 	/* Combat */
 	void EquipWeapon(AWeapon* Weapon);
@@ -40,15 +41,12 @@ public:
 	bool CanArm();
 	void DisArm();
 	bool CanDisArm();
-	bool CanAttack();
-	UFUNCTION(BlueprintCallable)
-	void AttackEnd();
+	virtual bool CanAttack() override;
+	virtual void AttackEnd() override;
 
-	void SetOverlappingItem(AItem* Item) override;
+	virtual void SetOverlappingItem(AItem* Item) override;
 
 	void PlayEquipMontage(FName MontageSection);
-	int32 PlayAttackMontage();
-	void StopAttackMontage();
 
 	UFUNCTION(BlueprintCallable)
 	void AttachWeaponToBack();
@@ -59,19 +57,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
 
-	UFUNCTION(BlueprintCallable)
-	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled);
-
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:	
-	// Utils
-	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
-	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
-
 	/* Character Components */
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;
@@ -121,18 +112,9 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
 
-	UPROPERTY(VisibleAnywhere)
-	AWeapon* EquippedWeapon;
-
 	/* Animation Montages */
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* EquipMontage;
-	
-	UPROPERTY(EditDefaultsOnly, Category = Combat)
-	UAnimMontage* AttackMontage;
-
-	UPROPERTY(EditAnywhere, Category = Combat)
-	TArray<FName> AttackMontageSections;
 
 public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
