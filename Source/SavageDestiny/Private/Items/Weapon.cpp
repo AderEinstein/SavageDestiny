@@ -18,9 +18,10 @@ AWeapon::AWeapon()
 	BoxTraceEnd->SetupAttachment(GetRootComponent());
 }
 
-void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, bool PlayEquippingSound)
+void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, bool bPlaySound)
 {
 	AttachMeshToSocket(InParent, InSocketName);
+	if (bPlaySound) PlayPickupSound();
 }
 
 void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName)

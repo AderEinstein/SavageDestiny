@@ -4,6 +4,7 @@
 #include "SavageDestiny/DebugMacros.h"
 #include "Components/SphereComponent.h"
 #include "Interfaces/PickupInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 AItem::AItem()
 {
@@ -57,6 +58,18 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	if (IPickupInterface* PickupInterface = Cast<IPickupInterface>(OtherActor))
 	{
 		PickupInterface->SetOverlappingItem(nullptr);
+	}
+}
+
+void AItem::PlayPickupSound()
+{
+	if (PickupSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			this,
+			PickupSound,
+			GetActorLocation()
+		);
 	}
 }
 

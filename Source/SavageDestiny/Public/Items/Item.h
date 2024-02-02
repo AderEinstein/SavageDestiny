@@ -7,6 +7,7 @@
 #include "Item.generated.h"
 
 class USphereComponent;
+class USoundBase;
 
 UCLASS()
 class SAVAGEDESTINY_API AItem : public AActor
@@ -34,6 +35,8 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	void PlayPickupSound();
+
 	/* Item Attributes */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Motion Parameters")
 	float Amplitude = 0.3f;
@@ -51,4 +54,7 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float RunningTime;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* PickupSound;
 };

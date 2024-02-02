@@ -16,11 +16,13 @@ class SAVAGEDESTINY_API AWeapon : public AItem
 public:
 	AWeapon();
 
-	void Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, bool PlayEquippingSound = true);
+	void Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, bool bPlaySound = true);
 	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
+	void PlayEquipSound();
 	FORCEINLINE void DisableMotion() { Amplitude = 0.f; }
 
 	TArray<AActor*> IgnoreActors;
+
 protected:
 	virtual void BeginPlay() override;
 
