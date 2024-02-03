@@ -3,6 +3,7 @@
 #include "Items/Weapon.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Interfaces/HitInterface.h"
 
 AWeapon::AWeapon()
 {
@@ -21,6 +22,8 @@ AWeapon::AWeapon()
 void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, bool bPlaySound)
 {
 	AttachMeshToSocket(InParent, InSocketName);
+	SetOwner(NewOwner);
+	SetInstigator(NewInstigator);
 	if (bPlaySound) PlayPickupSound();
 }
 
@@ -43,7 +46,15 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 	if (BoxHit.GetActor())
 	{
-		
+		ExecuteGetHit(BoxHit);
+	}
+}
+
+void AWeapon::ExecuteGetHit(FHitResult& BoxHit)
+{
+	if (IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor()))
+	{
+		HitInterface->Execute_GetHit(BoxHit.GetActor(), BoxHit.ImpactPoint, GetOwner());
 	}
 }
 

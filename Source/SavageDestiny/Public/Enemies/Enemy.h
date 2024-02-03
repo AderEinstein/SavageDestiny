@@ -16,6 +16,10 @@ class SAVAGEDESTINY_API AEnemy : public ABaseCharacter
 public:
 	AEnemy();
 
+	/* <IHitInterface> */
+	void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	/* </IHitInterface> */
+
 protected:
 	/* <AActor> */
 	virtual void BeginPlay() override;
@@ -27,5 +31,4 @@ protected:
 	virtual bool CanAttack() override;
 	virtual void AttackEnd() override;
 	/* </ABaseCharacter> */
-
 };

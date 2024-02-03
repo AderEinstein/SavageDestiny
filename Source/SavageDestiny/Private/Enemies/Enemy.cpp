@@ -13,6 +13,11 @@ AEnemy::AEnemy()
 	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
+void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
+{
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
+}
+
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
