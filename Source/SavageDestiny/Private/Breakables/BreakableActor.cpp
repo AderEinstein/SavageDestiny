@@ -28,6 +28,22 @@ void ABreakableActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ABreakableActor::SpawnTreasure()
+{
+	if (bBroken) return;
+	bBroken = true;
+	UWorld* World = GetWorld();
+	if (World && TreasureClasses.Num() > 0)
+	{
+		FVector Location = GetActorLocation();
+		const int32 Selection = FMath::RandRange(0, TreasureClasses.Num() - 1);
+		if (TreasureClasses[Selection])
+		{
+			World->SpawnActor<ATreasure>(TreasureClasses[Selection], Location, GetActorRotation());
+		}
+	}
+}
+
 void ABreakableActor::BeginPlay()
 {
 	Super::BeginPlay();

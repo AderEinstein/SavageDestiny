@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Items/Treasure.h"
 #include "BreakableActor.generated.h"
 
 UCLASS()
@@ -17,6 +18,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
+	UFUNCTION(BlueprintCallable)
+	void SpawnTreasure();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USceneComponent* BreakableRoot;
@@ -26,7 +30,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UCapsuleComponent* Capsule;
-
+	
 private:	
+	UPROPERTY(EditAnywhere, Category = "Breakable Properties")
+	TArray<TSubclassOf<class ATreasure>> TreasureClasses;
 
+	bool bBroken = false;
 };

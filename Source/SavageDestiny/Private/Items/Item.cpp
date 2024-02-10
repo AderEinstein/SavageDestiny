@@ -5,6 +5,8 @@
 #include "Components/SphereComponent.h"
 #include "Interfaces/PickupInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 AItem::AItem()
 {
@@ -16,6 +18,9 @@ AItem::AItem()
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	Sphere->SetupAttachment(ItemMesh);
 	Sphere->bHiddenInGame = true;
+
+	ItemEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Embers"));
+	ItemEffect->SetupAttachment(GetRootComponent());
 }
 
 void AItem::BeginPlay()
@@ -68,6 +73,18 @@ void AItem::PlayPickupSound()
 		UGameplayStatics::SpawnSoundAtLocation(
 			this,
 			PickupSound,
+			GetActorLocation()
+		);
+	}
+}
+
+void AItem::SpawnPickupSystem()
+{
+	if (PickupEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			this,
+			PickupEffect,
 			GetActorLocation()
 		);
 	}

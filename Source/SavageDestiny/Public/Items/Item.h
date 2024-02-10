@@ -37,6 +37,8 @@ protected:
 
 	void PlayPickupSound();
 
+	void SpawnPickupSystem();
+
 	/* Item Attributes */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Motion Parameters")
 	float Amplitude = 0.3f;
@@ -57,4 +59,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	USoundBase* PickupSound;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraComponent* ItemEffect;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* PickupEffect;
 };
