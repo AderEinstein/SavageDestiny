@@ -17,6 +17,9 @@ class UInputAction;
 struct FInputActionValue;
 class AItem;
 class AWeapon;
+class ATreasure;
+class ASoul;
+class USavageOverlay;
 
 UCLASS()
 class SAVAGEDESTINY_API ASavageCharacter : public ABaseCharacter, public IPickupInterface
@@ -45,6 +48,9 @@ public:
 	virtual void AttackEnd() override;
 
 	virtual void SetOverlappingItem(AItem* Item) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void AddSouls(ASoul* Soul) override;
+	virtual void AddGold(ATreasure* Treasure) override;
 
 	void PlayEquipMontage(FName MontageSection);
 
@@ -62,7 +68,10 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-private:	
+private:
+	void InitializeSavageOverlay();
+	void SetHUDHealth();
+
 	/* Character Components */
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;
@@ -115,6 +124,10 @@ private:
 	/* Animation Montages */
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* EquipMontage;
+
+	/* Widget */
+	UPROPERTY()
+	USavageOverlay* SavageOverlay;
 
 public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }

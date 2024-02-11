@@ -9,6 +9,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Items/Weapon.h"
 #include "Components/BoxComponent.h"
+#include "Components/AttributeComponent.h"
+#include "HUD/SavageHUD.h"
+#include "HUD/SavageOverlay.h"
+#include "Items/Soul.h"
+#include "Items/Treasure.h"
 
 ASavageCharacter::ASavageCharacter()
 {
@@ -48,6 +53,8 @@ void ASavageCharacter::BeginPlay()
 			Subsystem->AddMappingContext(CharacterIMC, 0);
 		}
 	}
+
+	InitializeSavageOverlay();
 }
 
 void ASavageCharacter::Tick(float DeltaTime)
@@ -158,6 +165,31 @@ void ASavageCharacter::SetOverlappingItem(AItem* Item)
 	OverlappingItem = Item;
 }
 
+void ASavageCharacter::AddSouls(ASoul* Soul)
+{
+	if (Attributes && SavageOverlay)
+	{
+		Attributes->AddSouls(Soul->GetSouls());
+		SavageOverlay->SetSouls(Attributes->GetSouls());
+	}
+}
+
+void ASavageCharacter::AddGold(ATreasure* Treasure)
+{
+	if (Attributes && SavageOverlay)
+	{
+		Attributes->AddGold(Treasure->GetGold());
+		SavageOverlay->SetGold(Attributes->GetGold());
+	}
+}
+
+float ASavageCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	HandleDamage(DamageAmount);
+	SetHUDHealth();
+	return DamageAmount;
+}
+
 void ASavageCharacter::EquipWeapon(AWeapon* Weapon)
 {
 	Weapon->DisableMotion();
@@ -233,4 +265,32 @@ void ASavageCharacter::AttachWeaponToHand()
 void ASavageCharacter::FinishEquipping()
 {
 	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void ASavageCharacter::InitializeSavageOverlay()
+{
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		ASavageHUD* SavageHUD = Cast<ASavageHUD>(PlayerController->GetHUD());
+		if (SavageHUD)
+		{
+			SavageOverlay = SavageHUD->GetSavageOverlay();
+			if (SavageOverlay && Attributes)
+			{
+				SavageOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+				SavageOverlay->SetStaminaBarPercent(1.f);
+				SavageOverlay->SetGold(0);
+				SavageOverlay->SetSouls(0);
+			}
+		}
+	}
+}
+
+void ASavageCharacter::SetHUDHealth()
+{
+	if (SavageOverlay)
+	{
+		SavageOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
 }

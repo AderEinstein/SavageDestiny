@@ -8,7 +8,7 @@ void ATreasure::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 {
 	if (IPickupInterface* PickupInterface = Cast<IPickupInterface>(OtherActor))
 	{
-		// PickupInterface->AddGold(this);
+		PickupInterface->AddGold(this);
 		PlayPickupSound();
 		Destroy();
 	}

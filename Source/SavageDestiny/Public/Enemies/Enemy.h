@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright: Ader Einstein 2024
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include "Characters/BaseCharacter.h"
 #include "Enemy.generated.h"
 
+class UHealthBarComponent;
 /**
  * 
  */
@@ -24,11 +25,19 @@ protected:
 	/* <AActor> */
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	/* </AActor> */
 
 	/* <ABaseCharacter> */
 	virtual void Attack();
 	virtual bool CanAttack() override;
 	virtual void AttackEnd() override;
+	virtual void HandleDamage(float DamageAmount) override;
 	/* </ABaseCharacter> */
+
+private:
+	void ShowHealthBar();
+	void HideHealthBar();
+	UPROPERTY(EditAnywhere)
+	UHealthBarComponent* HealthBarWidget;
 };

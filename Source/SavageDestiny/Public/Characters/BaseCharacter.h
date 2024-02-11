@@ -9,6 +9,7 @@
 
 class AWeapon;
 class UAnimMontage;
+class UAttributeComponent;
 
 UCLASS()
 class SAVAGEDESTINY_API ABaseCharacter : public ACharacter, public IHitInterface
@@ -25,6 +26,7 @@ protected:
 	// Combat
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void Attack();
+	virtual void HandleDamage(float DamageAmount);
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	void SpawnHitParticles(const FVector& ImpactPoint);
 	void PlayHitSound(const FVector& ImpactPoint);
@@ -42,8 +44,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled);
 
+	
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	AWeapon* EquippedWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAttributeComponent* Attributes;
 
 private:
 	// Utils

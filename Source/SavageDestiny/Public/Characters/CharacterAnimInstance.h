@@ -1,5 +1,7 @@
 // Copyright: Ader Einstein 2024
 
+#pragma once
+
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "Characters/CharacterTypes.h"
