@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
+#include "Characters/CharacterTypes.h"
 #include "Enemy.generated.h"
 
 class UHealthBarComponent;
+class ASoul;
 /**
  * 
  */
@@ -33,9 +35,23 @@ protected:
 	virtual bool CanAttack() override;
 	virtual void AttackEnd() override;
 	virtual void HandleDamage(float DamageAmount) override;
+	virtual void Die_Implementation() override;
 	/* </ABaseCharacter> */
 
+	EEnemyState EnemyState;
+
 private:
+	/* AI Behaviour */
+	bool IsDead();
+	void SpawnSoul();
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	float DeathLifeSpan = 8.f;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<ASoul> SoulClass;
+
+	/* Health Widget */
 	void ShowHealthBar();
 	void HideHealthBar();
 	UPROPERTY(EditAnywhere)

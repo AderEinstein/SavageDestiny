@@ -30,20 +30,22 @@ protected:
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	void SpawnHitParticles(const FVector& ImpactPoint);
 	void PlayHitSound(const FVector& ImpactPoint);
+	UFUNCTION(BlueprintNativeEvent)
+	void Die();
+	void DisableCapsule();
 	bool IsAlive();
+	virtual bool CanAttack();
 
 	// Montage functions
-	virtual bool CanAttack();
-	virtual int32 PlayAttackMontage();
-	void PlayHitReactMontage(const FName& SectionName);
+	int32 PlayAttackMontage();
 	void StopAttackMontage();
+	void PlayHitReactMontage(const FName& SectionName);
+	int32 PlayDeathMontage();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
-
 	UFUNCTION(BlueprintCallable)
 	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled);
-
 	
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	AWeapon* EquippedWeapon;
@@ -65,13 +67,16 @@ private:
 	// Animation Montages
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* AttackMontage;
-
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TArray<FName> AttackMontageSections;
 
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* HitReactMontage;
-
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TArray<FName> HitReactMontageSections;
+
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
+	UAnimMontage* DeathMontage;
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TArray<FName> DeathMontageSections;
 };
