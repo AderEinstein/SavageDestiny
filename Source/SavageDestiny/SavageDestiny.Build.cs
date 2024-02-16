@@ -8,7 +8,7 @@ public class SavageDestiny : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HairStrandsCore", "Niagara", "EnhancedInput", "GeometryCollectionEngine" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HairStrandsCore", "Niagara", "EnhancedInput", "GeometryCollectionEngine", "AIModule" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

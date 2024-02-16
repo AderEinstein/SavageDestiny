@@ -55,6 +55,8 @@ void ASavageCharacter::BeginPlay()
 	}
 
 	InitializeSavageOverlay();
+
+	Tags.Add(FName("EngageableTarget"));
 }
 
 void ASavageCharacter::Tick(float DeltaTime)

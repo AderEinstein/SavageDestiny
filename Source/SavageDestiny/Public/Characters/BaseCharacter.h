@@ -46,37 +46,40 @@ protected:
 	virtual void AttackEnd();
 	UFUNCTION(BlueprintCallable)
 	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled);
-	
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
+
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
 	AWeapon* EquippedWeapon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAttributeComponent* Attributes;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
+	AActor* CombatTarget;
 
 private:
 	// Utils
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 
-	UPROPERTY(EditAnywhere, Category = Combat)
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	USoundBase* HitSound;
 
-	UPROPERTY(EditAnywhere, Category = Combat)
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	UParticleSystem* HitParticles;
 
 	// Animation Montages
-	UPROPERTY(EditDefaultsOnly, Category = Combat)
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UAnimMontage* AttackMontage;
-	UPROPERTY(EditAnywhere, Category = Combat)
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FName> AttackMontageSections;
 
-	UPROPERTY(EditDefaultsOnly, Category = Combat)
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UAnimMontage* HitReactMontage;
-	UPROPERTY(EditAnywhere, Category = Combat)
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FName> HitReactMontageSections;
 
-	UPROPERTY(EditDefaultsOnly, Category = Combat)
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UAnimMontage* DeathMontage;
-	UPROPERTY(EditAnywhere, Category = Combat)
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FName> DeathMontageSections;
 };
