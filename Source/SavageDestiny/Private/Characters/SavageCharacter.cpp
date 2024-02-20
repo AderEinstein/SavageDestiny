@@ -40,6 +40,27 @@ ASavageCharacter::ASavageCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 360.f, 0.f);
+
+	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
+}
+
+void ASavageCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
+{
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
+
+	SetEnabledWeaponCollision(ECollisionEnabled::NoCollision); // if character is interrupted when attacking, need to disable its weapon collision
+
+	ActionState = IsAlive() ? EActionState::EAS_HitReacting : EActionState::EAS_Dead;
+}
+
+void ASavageCharacter::Die_Implementation()
+{
+	Super::Die_Implementation();
+	ActionState = EActionState::EAS_Dead;
 }
 
 void ASavageCharacter::BeginPlay()
@@ -84,7 +105,7 @@ void ASavageCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void ASavageCharacter::Move(const FInputActionValue& Value)
 {
-	if (IsOccupied()) return;
+	if (!CanMove()) return;
 
 	const FVector2D DirectionValue = Value.Get<FVector2D>();
 	if (Controller && DirectionValue != FVector2D::ZeroVector)
@@ -112,7 +133,7 @@ void ASavageCharacter::Look(const FInputActionValue& Value)
 
 void ASavageCharacter::Jump()
 {
-	if (IsOccupied()) return;
+	if (!CanJump()) return;
 
 	Super::Jump();
 }
@@ -122,9 +143,9 @@ void ASavageCharacter::Equip()
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon)
 	{
-		if (EquippedWeapon)
+		if (EquippedWeaponRH)
 		{
-			EquippedWeapon->Destroy();
+			EquippedWeaponRH->Destroy();
 		}
 		EquipWeapon(OverlappingWeapon);
 	}
@@ -141,6 +162,15 @@ void ASavageCharacter::Equip()
 	}
 }
 
+void ASavageCharacter::Attack()
+{
+	if (CanAttack())
+	{
+		PlayAttackMontage();
+		ActionState = EActionState::EAS_Attacking;
+	}
+}
+
 void ASavageCharacter::Accelerate()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 800.f;
@@ -151,15 +181,6 @@ void ASavageCharacter::Deccelerate()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	bAccelerating = false;
-}
-
-void ASavageCharacter::Attack()
-{
-	if (CanAttack())
-	{
-		PlayAttackMontage();
-		ActionState = EActionState::EAS_Attacking;
-	}
 }
 
 void ASavageCharacter::SetOverlappingItem(AItem* Item)
@@ -199,7 +220,7 @@ void ASavageCharacter::EquipWeapon(AWeapon* Weapon)
 	Weapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
 	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 	OverlappingItem = nullptr;
-	EquippedWeapon = Weapon;
+	EquippedWeaponRH = Weapon;
 }
 
 void ASavageCharacter::Arm()
@@ -209,18 +230,18 @@ void ASavageCharacter::Arm()
 	ActionState = EActionState::EAS_EquippingWeapon;
 }
 
-bool ASavageCharacter::CanArm()
-{
-	return ActionState == EActionState::EAS_Unoccupied &&
-		CharacterState == ECharacterState::ECS_Unequipped &&
-		EquippedWeapon;
-}
-
 void ASavageCharacter::DisArm()
 {
 	PlayEquipMontage(FName("Unequip"));
 	CharacterState = ECharacterState::ECS_Unequipped;
 	ActionState = EActionState::EAS_EquippingWeapon;
+}
+
+bool ASavageCharacter::CanArm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState == ECharacterState::ECS_Unequipped &&
+		EquippedWeaponRH;
 }
 
 bool ASavageCharacter::CanDisArm()
@@ -231,6 +252,16 @@ bool ASavageCharacter::CanDisArm()
 bool ASavageCharacter::CanAttack()
 {
 	return CanDisArm();
+}
+
+bool ASavageCharacter::CanJump()
+{
+	return (ActionState == EActionState::EAS_Unoccupied || ActionState == EActionState::EAS_Attacking) && ActionState != EActionState::EAS_Dead;
+}
+
+bool ASavageCharacter::CanMove()
+{
+	return ActionState != EActionState::EAS_Dead && ActionState == EActionState::EAS_Unoccupied;
 }
 
 void ASavageCharacter::AttackEnd()
@@ -250,21 +281,26 @@ void ASavageCharacter::PlayEquipMontage(FName MontageSection)
 
 void ASavageCharacter::AttachWeaponToBack()
 {
-	if (EquippedWeapon)
+	if (EquippedWeaponRH)
 	{
-		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
+		EquippedWeaponRH->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
 	}
 }
 
 void ASavageCharacter::AttachWeaponToHand()
 {
-	if (EquippedWeapon)
+	if (EquippedWeaponRH)
 	{
-		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+		EquippedWeaponRH->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
 	}
 }
 
 void ASavageCharacter::FinishEquipping()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void ASavageCharacter::HitReactEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
 }

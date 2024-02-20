@@ -43,18 +43,33 @@ protected:
 	int32 PlayDeathMontage();
 
 	UFUNCTION(BlueprintCallable)
+	FVector GetTranslationWarpTarget();
+	UFUNCTION(BlueprintCallable)
+	FVector GetRotationWarpTarget();
+	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
 	UFUNCTION(BlueprintCallable)
-	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled);
-
+	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, const FName& Weapon = FName("RH"));
+	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, AWeapon* Weapon);
+	
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<AWeapon> WeaponClassRH;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<AWeapon> WeaponClassLH;
 	UPROPERTY(VisibleAnywhere, Category = "Combat")
-	AWeapon* EquippedWeapon;
+	AWeapon* EquippedWeaponRH;
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	AWeapon* EquippedWeaponLH;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAttributeComponent* Attributes;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	double WarpTargetDistance = 75.f;
 
 private:
 	// Utils

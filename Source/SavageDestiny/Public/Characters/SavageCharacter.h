@@ -28,24 +28,29 @@ class SAVAGEDESTINY_API ASavageCharacter : public ABaseCharacter, public IPickup
 
 public:
 	ASavageCharacter();
+	void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	void Die_Implementation() override;
 
 	/* Input Callbacks */
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void Jump() override;
 	void Equip();
+	void Attack() override;
+	void Jump() override;
 	void Accelerate();
 	void Deccelerate();
-	virtual void Attack() override;
 
 	/* Combat */
 	void EquipWeapon(AWeapon* Weapon);
 	void Arm();
-	bool CanArm();
 	void DisArm();
+	bool CanArm();
 	bool CanDisArm();
-	virtual bool CanAttack() override;
-	virtual void AttackEnd() override;
+	bool CanAttack() override;
+	bool CanJump();
+	bool CanMove();
+
+	void AttackEnd() override;
 
 	virtual void SetOverlappingItem(AItem* Item) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -62,6 +67,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
+
+	UFUNCTION(BlueprintCallable)
+	void HitReactEnd();
 
 protected:
 	virtual void BeginPlay() override;

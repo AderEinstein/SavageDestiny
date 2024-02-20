@@ -39,7 +39,7 @@ private:
 	FVector BoxTraceExtent = FVector(5.f);
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
-	bool bShowBoxDebug = true;
+	bool bShowBoxDebug = false;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	UBoxComponent* WeaponBox;

@@ -22,7 +22,7 @@ AEnemy::AEnemy()
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 
-	EnemyState = EEnemyState::EES_NoState;
+	EnemyState = EEnemyState::EES_Patrolling;
 
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
 	PawnSensing->SightRadius = 4000.f;
@@ -42,6 +42,20 @@ void AEnemy::BeginPlay()
 	HideHealthBar();
 	EnemyController = Cast<AAIController>(GetController());
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
+	UWorld* World = GetWorld();
+	if (World && WeaponClassRH && WeaponClassLH)
+	{
+		// TODO: REFACTOR TO ONE HELPER FUNCTION AWeapon* SpawnWeaponToSocket(FName("socket"))
+		AWeapon* EnemyWeaponRH = World->SpawnActor<AWeapon>(WeaponClassRH);
+		EnemyWeaponRH->Equip(GetMesh(), FName("WeaponSocketRH"), this, this, false);
+		EquippedWeaponRH = EnemyWeaponRH;
+
+		AWeapon* EnemyWeaponLH = World->SpawnActor<AWeapon>(WeaponClassLH);
+		EnemyWeaponLH->Equip(GetMesh(), FName("WeaponSocketLH"), this, this, false);
+		EquippedWeaponLH = EnemyWeaponLH;
+	}
+
+	Tags.Add(FName("Enemy"));
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -63,7 +77,14 @@ void AEnemy::Tick(float DeltaTime)
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
-	if (!IsDead()) ShowHealthBar();
+
+	if (IsAlive()) ShowHealthBar();
+	ShowHealthBar();
+	ClearPatrolTimer();
+	ClearAttackTimer();
+	StopAttackMontage();
+	SetEnabledWeaponCollision(ECollisionEnabled::NoCollision, FName("RH"));
+	SetEnabledWeaponCollision(ECollisionEnabled::NoCollision, FName("LH"));
 }
 
 void AEnemy::Die_Implementation()
@@ -75,26 +96,52 @@ void AEnemy::Die_Implementation()
 	DisableCapsule();
 	SetLifeSpan(DeathLifeSpan);
 	SpawnSoul();
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	HandleDamage(DamageAmount);
+	if (!IsAlive())
+	{
+		ClearAttackTimer();
+		ClearPatrolTimer();
+		return DamageAmount;
+	}
+	CombatTarget = EventInstigator->GetPawn();
+	if (IsInsideAttackRadius())
+	{
+		StartAttackTimer();
+	}
+	else if (IsOutsideAttackRadius())
+	{
+		ChaseTarget();
+	}
 	return DamageAmount;
 }
 
 void AEnemy::Attack()
 {
+	if (CombatTarget == nullptr) return;
 	Super::Attack();
+	EnemyState = EEnemyState::EES_Engaged;
+	PlayAttackMontage();
 }
 
 bool AEnemy::CanAttack()
 {
-	return true;
+	bool bCanAttack =
+		IsInsideAttackRadius() &&
+		!IsAttacking() &&
+		!IsEngaged() &&
+		IsAlive(); // IsAlive() is set earlier than IsDead() & is therefore the right option here 
+	return bCanAttack;
 }
 
 void AEnemy::AttackEnd()
 {
+	EnemyState = EEnemyState::EES_NoState;
+	CheckCombatTarget();
 }
 
 void AEnemy::HandleDamage(float DamageAmount)
@@ -155,7 +202,7 @@ AActor* AEnemy::ChoosePatrolTarget()
 
 void AEnemy::CheckCombatTarget()
 {
-	if (IsOutsideCombatRadius())
+	if (IsOutsideCombatRadius() || CombatTarget->ActorHasTag(FName("Dead")))
 	{
 		LoseInterest();
 		ClearAttackTimer();
@@ -174,6 +221,9 @@ void AEnemy::CheckCombatTarget()
 
 void AEnemy::StartAttackTimer()
 {
+	EnemyState = EEnemyState::EES_Attacking;
+	const float AttackTime = FMath::RandRange(AttackMin, AttackMax);
+	GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::Attack, AttackTime);
 }
 
 void AEnemy::ChaseTarget()
@@ -192,7 +242,7 @@ void AEnemy::LoseInterest()
 void AEnemy::PawnSeen(APawn* SeenPawn)
 {
 	const bool bShouldChaseTarget =
-		EnemyState == EEnemyState::EES_Patrolling && SeenPawn->ActorHasTag(FName("EngageableTarget"));
+		SeenPawn->ActorHasTag(FName("EngageableTarget"));
 
 	if (bShouldChaseTarget)
 	{
@@ -273,7 +323,7 @@ void AEnemy::HideHealthBar()
 {
 	if (HealthBarWidget)
 	{
-		HealthBarWidget->SetVisibility(false);	
+		HealthBarWidget->SetVisibility(false);
 	}
 }
 
