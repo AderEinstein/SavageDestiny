@@ -98,6 +98,7 @@ void ASavageCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(AccelerateAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Accelerate);
 		EnhancedInputComponent->BindAction(AccelerateAction, ETriggerEvent::Completed, this, &ASavageCharacter::Deccelerate);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ASavageCharacter::Attack);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Completed, this, &ASavageCharacter::ResetAttackTrigger);
 	}
 }
 
@@ -164,11 +165,18 @@ void ASavageCharacter::Equip()
 
 void ASavageCharacter::Attack()
 {
-	if (CanAttack())
+	if (CanAttack() && !bAttackRequested)
 	{
+		bCanAttack = false; 
+		bAttackRequested = true; // one attack per mouse click
 		PlayAttackMontage();
 		ActionState = EActionState::EAS_Attacking;
 	}
+}
+
+void ASavageCharacter::ResetAttackTrigger()
+{
+	bAttackRequested = false;
 }
 
 void ASavageCharacter::Accelerate()
@@ -251,7 +259,7 @@ bool ASavageCharacter::CanDisArm()
 
 bool ASavageCharacter::CanAttack()
 {
-	return CanDisArm();
+	return bCanAttack && CharacterState != ECharacterState::ECS_Unequipped;
 }
 
 bool ASavageCharacter::CanJump()
@@ -264,9 +272,15 @@ bool ASavageCharacter::CanMove()
 	return ActionState != EActionState::EAS_Dead && ActionState == EActionState::EAS_Unoccupied;
 }
 
+void ASavageCharacter::AttackMinEnd()
+{
+	bCanAttack = true;
+}
+
 void ASavageCharacter::AttackEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
+	bCanAttack = true;
 }
 
 void ASavageCharacter::PlayEquipMontage(FName MontageSection)
@@ -303,6 +317,7 @@ void ASavageCharacter::FinishEquipping()
 void ASavageCharacter::HitReactEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
+	bCanAttack = true;
 }
 
 void ASavageCharacter::InitializeSavageOverlay()

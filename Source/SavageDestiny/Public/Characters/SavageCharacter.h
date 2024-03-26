@@ -35,7 +35,8 @@ public:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Equip();
-	void Attack() override;
+	void Attack() override; 
+	void ResetAttackTrigger();
 	void Jump() override;
 	void Accelerate();
 	void Deccelerate();
@@ -50,6 +51,7 @@ public:
 	bool CanJump();
 	bool CanMove();
 
+	void AttackMinEnd();
 	void AttackEnd() override;
 
 	virtual void SetOverlappingItem(AItem* Item) override;
@@ -116,14 +118,20 @@ private:
 	UInputAction* AttackAction;
 
 	/* States */
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = State)
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = State)
 	EActionState ActionState = EActionState::EAS_Unoccupied;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = State)
 	bool bAccelerating = false;
+
+	UPROPERTY(VisibleAnywhere, Category = State)
+	bool bAttackRequested = false;
+
+	UPROPERTY(VisibleAnywhere, Category = State)
+	bool bCanAttack = true;
 
 	/* Items */
 	UPROPERTY(VisibleInstanceOnly)
