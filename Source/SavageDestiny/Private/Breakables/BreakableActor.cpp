@@ -3,6 +3,7 @@
 #include "Breakables/BreakableActor.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ABreakableActor::ABreakableActor()
 {
@@ -28,10 +29,17 @@ void ABreakableActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ABreakableActor::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
+{
+	PlayBreakableSound();
+	SpawnTreasure();
+	SetLifeSpan(BreakableLifespan);
+	Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+}
+
+
 void ABreakableActor::SpawnTreasure()
 {
-	if (bBroken) return;
-	bBroken = true;
 	UWorld* World = GetWorld();
 	if (World && TreasureClasses.Num() > 0)
 	{
@@ -41,6 +49,18 @@ void ABreakableActor::SpawnTreasure()
 		{
 			World->SpawnActor<ATreasure>(TreasureClasses[Selection], Location, GetActorRotation());
 		}
+	}
+}
+
+void ABreakableActor::PlayBreakableSound()
+{
+	if (BreakableSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			this,
+			BreakableSound,
+			GetActorLocation()
+		);
 	}
 }
 
