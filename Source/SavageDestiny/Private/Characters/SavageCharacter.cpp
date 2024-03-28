@@ -169,8 +169,16 @@ void ASavageCharacter::Attack()
 	{
 		bCanAttack = false; 
 		bAttackRequested = true; // one attack per mouse click
-		PlayAttackMontage();
 		ActionState = EActionState::EAS_Attacking;
+
+		if (AttacksExecuted >= 3)
+		{
+			PlayComboAttackMontage();
+		}
+		else
+		{
+			PlayAttackMontage();
+		}
 	}
 }
 
@@ -275,12 +283,14 @@ bool ASavageCharacter::CanMove()
 void ASavageCharacter::AttackMinEnd()
 {
 	bCanAttack = true;
+	AttacksExecuted++;
 }
 
 void ASavageCharacter::AttackEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
 	bCanAttack = true;
+	AttacksExecuted = 0; // reset count if next attack is outside attack combo range
 }
 
 void ASavageCharacter::PlayEquipMontage(FName MontageSection)

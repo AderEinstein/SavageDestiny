@@ -38,6 +38,7 @@ protected:
 
 	// Montage functions
 	int32 PlayAttackMontage();
+	int32 PlayComboAttackMontage();
 	void StopAttackMontage();
 	void PlayHitReactMontage(const FName& SectionName);
 	int32 PlayDeathMontage();
@@ -48,6 +49,8 @@ protected:
 	FVector GetRotationWarpTarget();
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
+	UFUNCTION(BlueprintCallable)
+	virtual void AttackMinEnd(); // callback after minimum length of an attack was played, to enable combo attacks
 	UFUNCTION(BlueprintCallable)
 	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, const FName& Weapon = FName("RH"));
 	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, AWeapon* Weapon);
@@ -76,6 +79,8 @@ private:
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 
+	int32 LastAttackMontageSection = -1;
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	USoundBase* HitSound;
 
@@ -86,7 +91,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UAnimMontage* AttackMontage;
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	TArray<FName> AttackMontageSections;
+	TArray<FName> AttackMontageSections;	
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	UAnimMontage* AttackComboMontage;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TArray<FName> AttackComboMontageSections;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UAnimMontage* HitReactMontage;

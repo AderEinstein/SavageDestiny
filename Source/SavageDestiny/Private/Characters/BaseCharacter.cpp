@@ -145,6 +145,11 @@ int32 ABaseCharacter::PlayAttackMontage()
 	return PlayRandomMontageSection(AttackMontage, AttackMontageSections);
 }
 
+int32 ABaseCharacter::PlayComboAttackMontage()
+{
+	return PlayRandomMontageSection(AttackComboMontage, AttackComboMontageSections);
+}
+
 void ABaseCharacter::StopAttackMontage()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -186,6 +191,10 @@ void ABaseCharacter::AttackEnd()
 {
 }
 
+void ABaseCharacter::AttackMinEnd()
+{
+}
+
 void ABaseCharacter::SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, const FName& Weapon)
 {
 	if (Weapon == "RH") 
@@ -215,9 +224,17 @@ void ABaseCharacter::PlayMontageSection(UAnimMontage* Montage, const FName& Sect
 
 int32 ABaseCharacter::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames)
 {
-	if (SectionNames.Num() <= 0) return -1;
+	if (SectionNames.Num() <= 0 || !Montage) return -1;
 	const int32 MaxSectionIndex = SectionNames.Num() - 1;
-	const int32 Selection = FMath::RandRange(0, MaxSectionIndex);
+	int32 Selection = FMath::RandRange(0, MaxSectionIndex);
+	if (Montage == AttackMontage)
+	{
+		do {
+			Selection = FMath::RandRange(0, MaxSectionIndex);
+		} while (LastAttackMontageSection == Selection);
+
+		LastAttackMontageSection = Selection;
+	}
 	PlayMontageSection(Montage, SectionNames[Selection]);
 	return Selection;
 }

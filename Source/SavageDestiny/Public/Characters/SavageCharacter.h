@@ -53,6 +53,7 @@ public:
 
 	void AttackMinEnd();
 	void AttackEnd() override;
+	int32 AttacksExecuted = 0;
 
 	virtual void SetOverlappingItem(AItem* Item) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
