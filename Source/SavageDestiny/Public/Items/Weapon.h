@@ -55,4 +55,5 @@ private:
 
 public:
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; }
+	FORCEINLINE float GetDamage() const { return Damage; }
 };

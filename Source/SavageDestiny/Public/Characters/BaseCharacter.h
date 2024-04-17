@@ -27,7 +27,7 @@ protected:
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void Attack();
 	virtual void HandleDamage(float DamageAmount);
-	void DirectionalHitReact(const FVector& ImpactPoint);
+	void DirectionalHitReact(const FVector& ImpactPoint, float Damage);
 	void SpawnHitParticles(const FVector& ImpactPoint);
 	void PlayHitSound(const FVector& ImpactPoint);
 	UFUNCTION(BlueprintNativeEvent)
@@ -40,7 +40,7 @@ protected:
 	int32 PlayAttackMontage();
 	int32 PlayComboAttackMontage();
 	void StopAttackMontage();
-	void PlayHitReactMontage(const FName& SectionName);
+	void PlayHitReactMontage(const FName& SectionName, bool bReactSmall = true);
 	int32 PlayDeathMontage();
 
 	UFUNCTION(BlueprintCallable)
@@ -52,7 +52,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackMinEnd(); // callback after minimum length of an attack was played, to enable combo attacks
 	UFUNCTION(BlueprintCallable)
-	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, const FName& Weapon = FName("RH"));
+	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, const FName& WeaponHand = FName("RH"));
 	void SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, AWeapon* Weapon);
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
@@ -91,14 +91,18 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UAnimMontage* AttackMontage;
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	TArray<FName> AttackMontageSections;	
+	TArray<FName> AttackMontageSections;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UAnimMontage* AttackComboMontage;
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FName> AttackComboMontageSections;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
-	UAnimMontage* HitReactMontage;
+	UAnimMontage* HitReactMontageSmall;
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	UAnimMontage* HitReactMontageLarge;
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FName> HitReactMontageSections;
 

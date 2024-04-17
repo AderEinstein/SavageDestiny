@@ -114,7 +114,7 @@ private:
 	float AttackMax = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	float ChasingSpeed = 300.f;
+	float ChasingSpeed = 400.f;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	double CombatRadius = 750.f;

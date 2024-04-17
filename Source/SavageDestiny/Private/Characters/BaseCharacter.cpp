@@ -31,11 +31,17 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 {
 	if (IsAlive() && Hitter)
 	{
+		float Damage;
+		if (ABaseCharacter* Attacker = Cast<ABaseCharacter>(Hitter))
+		{
+			Damage = Attacker->EquippedWeaponRH->GetDamage();
+		}
+
 		/*
 		* Hit react based on hitter position 
 		* i.e react away from hitter instead of away from impact point - DirectionalHitReact(ImpactPoint);
 		*/
-		DirectionalHitReact(Hitter->GetActorLocation());
+		DirectionalHitReact(Hitter->GetActorLocation(), Damage);
 	}
 	else if (!ActorHasTag("Dead")) // prevent death montage beign played multiple times after hitting a dead enemy
 	{
@@ -63,7 +69,7 @@ void ABaseCharacter::HandleDamage(float DamageAmount)
 	}
 }
 
-void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
+void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint, float Damage)
 {
 	const FVector Forward = GetActorForwardVector();
 	const FVector ImpactPointLowered(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
@@ -93,6 +99,7 @@ void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
 	{
 		Section = FName("FromRight");
 	}
+
 	PlayHitReactMontage(Section);
 
 	// if (GEngine)
@@ -159,9 +166,12 @@ void ABaseCharacter::StopAttackMontage()
 	}
 }
 
-void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)
+void ABaseCharacter::PlayHitReactMontage(const FName& SectionName, bool bSmallReaction)
 {
-	PlayMontageSection(HitReactMontage, SectionName);
+	if (bSmallReaction)
+		PlayMontageSection(HitReactMontageSmall, SectionName);
+	else
+		PlayMontageSection(HitReactMontageLarge, SectionName);
 }
 
 int32 ABaseCharacter::PlayDeathMontage()
@@ -195,19 +205,20 @@ void ABaseCharacter::AttackMinEnd()
 {
 }
 
-void ABaseCharacter::SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, const FName& Weapon)
+void ABaseCharacter::SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, const FName& WeaponHand)
 {
-	if (Weapon == "RH") 
+	if (WeaponHand == "RH") 
 		SetEnabledWeaponCollision(CollisionEnabled, EquippedWeaponRH);
 	else
 		SetEnabledWeaponCollision(CollisionEnabled, EquippedWeaponLH);
 }
+
 void ABaseCharacter::SetEnabledWeaponCollision(ECollisionEnabled::Type CollisionEnabled, AWeapon* Weapon)
 {
-	if (EquippedWeaponRH && EquippedWeaponRH->GetWeaponBox())
+	if (Weapon && Weapon->GetWeaponBox())
 	{
-		EquippedWeaponRH->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedWeaponRH->IgnoreActors.Empty();
+		Weapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		Weapon->IgnoreActors.Empty();
 	}
 }
 
